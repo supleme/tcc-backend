@@ -13,7 +13,7 @@ class ApontamentoController extends Controller
       try {
         $validated = $request->validate([
           'categoria' => 'required|string|in:Atividade,Subprojeto',
-          'id_aluno' => 'required|integer|exists:alunos,id_aluno',
+          'id_aluno' => 'required|integer|integer',
           'data_apontamento' => 'required|date',
           'horas_trabalhadas' => 'required|numeric|min:0',
           'midia' => 'nullable|string|max:255',
