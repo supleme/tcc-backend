@@ -1,5 +1,7 @@
 ## Up project
 
+docker-compose down
+
 docker-compose up -d
 
 docker exec -it tcc_backend bash

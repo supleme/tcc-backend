@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Aluno;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
@@ -19,10 +20,13 @@ class StudentController extends Controller
           'endereco' => 'nullable|string|max:255',
           'cidade' => 'nullable|string|max:100',
           'telefone' => 'nullable|string|max:20',
-          'email' => 'nullable|email|max:255',
-          'CPF' => 'nullable|string|max:14',
+          'email' => 'required|email|max:255|unique:alunos,email',
+          'password' => 'required|string|min:6',
+          'CPF' => 'nullable|string|max:14|unique:alunos,CPF',
           'ativo' => 'boolean',
         ]);
+
+        $validated['password'] = Hash::make($validated['password']);
 
         $aluno = Aluno::create($validated);
 

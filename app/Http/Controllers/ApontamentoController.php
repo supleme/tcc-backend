@@ -50,4 +50,23 @@ class ApontamentoController extends Controller
         ], 500);
     }
   }
+
+  public function getByAluno($id_aluno)
+  {
+    try {
+      $apontamentos = Apontamento::where('id_aluno', $id_aluno)->get();
+
+      if ($apontamentos->isEmpty()) {
+        return response()->json(['message' => 'Nenhum apontamento encontrado para este aluno.'], 404);
+      }
+      return response()->json($apontamentos, 200);
+
+    }
+    catch (\Exception $e) {
+      return response()->json([
+        'message' => 'Erro ao buscar apontamentos.',
+        'error' => $e->getMessage()
+      ], 500);
+    }
+  }
 }
