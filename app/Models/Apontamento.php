@@ -14,13 +14,18 @@ class Apontamento extends Model
     public $timestamps = false; // sua tabela já tem data_criacao, então não precisa de created_at/updated_at
 
     protected $fillable = [
-        'categoria',
-        'id_aluno',
-        'data_apontamento',
-        'horas_trabalhadas',
-        'midia',
-        'id_subprojeto',
-        'descricao',
-        'data_criacao'
+      'categoria',
+      'id_aluno',
+      'data_apontamento',
+      'horas_trabalhadas',
+      'midia',
+      'id_subprojeto',
+      'descricao',
+      'data_criacao'
     ];
+
+    public function aluno()
+    {
+        return $this->belongsTo(Aluno::class, 'id_aluno');
+    }
 }

@@ -39,9 +39,35 @@ class ApontamentoController extends Controller
       }
     }
 
-  public function listNote(){
+  public function listNote($category, $student){
+    //dd($category, $student);
     try {
-      $apontamentos = Apontamento::all();
+      $query = Apontamento::query();
+
+      $query->with(['aluno' => function($q) {
+        $q->select('id_aluno', 'nome');
+      }]);
+
+      if($category !== 'Todas'){
+        $query->where('categoria', $category);
+      }
+
+      if($student !== 'Todos'){
+        $query->where('id_aluno', $student);
+        $studentArray = explode(',', $student);
+        $query->whereIn('id_aluno', $studentArray);
+      }
+      $apontamentos = $query->get();
+
+      $apontamentos = $apontamentos->map(function ($apontamento) {
+        $apontamento->aluno_nome = $apontamento->aluno->nome;
+        unset($apontamento->aluno); // Remove a relação para simplificar o JSON
+        return $apontamento;
+      });
+
+      if ($apontamentos->isEmpty()) {
+        return response()->json(['message' => 'Nenhum apontamento encontrado para este aluno.'], 404);
+      }
       return response()->json($apontamentos, 200);
     } catch (\Exception $e) {
         return response()->json([

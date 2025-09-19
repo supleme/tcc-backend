@@ -30,8 +30,6 @@ Route::get('/alunos/{id}', function ($id){
     return Aluno::find($id);
 });
 
-
-
 Route::get('/apontamentos', function () {
     return Apontamento::all();
 });
@@ -41,6 +39,7 @@ Route::get('/apontamentos/aluno/{id_aluno}', [ApontamentoController::class, 'get
 
 Route::post('/apontamentos', [ApontamentoController::class, 'registerApontamento']);
 
+Route::get('/alunos/report/{category}/{students}', [ApontamentoController::class, 'listNote']);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/refresh', [AuthController::class, 'refresh']);
