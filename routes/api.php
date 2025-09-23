@@ -3,8 +3,10 @@
 use App\Http\Controllers\ApontamentoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\SubprojectController;
 use App\Models\Aluno;
 use App\Models\Apontamento;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 
@@ -20,11 +22,14 @@ Route::get('/test-db', function () {
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/refresh', [AuthController::class, 'refresh']);
 
+Route::get('/users', function (){
+    return User::all();
+});
+
+
 Route::post('/alunos', [StudentController::class, 'registerStudent']);
 
-Route::get('/alunos', function (){
-    return Aluno::all();
-});
+Route::get('/alunos', [StudentController::class, 'getStudents']);
 
 Route::get('/alunos/{id}', function ($id){
     return Aluno::find($id);
@@ -38,6 +43,8 @@ Route::get('/apontamentos/aluno/{id_aluno}', [ApontamentoController::class, 'get
 
 
 Route::post('/apontamentos', [ApontamentoController::class, 'registerApontamento']);
+
+Route::post('/subprojects', [SubprojectController::class, 'registerSubproject']);
 
 Route::get('/alunos/report/{category}/{students}', [ApontamentoController::class, 'listNote']);
 
