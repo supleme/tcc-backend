@@ -13,6 +13,9 @@ class User extends Authenticatable implements JWTSubject
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    protected $table = 'users';
+    protected $primaryKey = 'id_usuario';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -22,7 +25,20 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'type',
+        'RA',
+        'course',
+        'period',
+        'address',
+        'city',
+        'telephone',
+        'birth_date',
+        'CPF',
+        'active',
+        'position',
+        'admission_date'
     ];
+
 
     /**
      * The attributes that should be hidden for serialization.
