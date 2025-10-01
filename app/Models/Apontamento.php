@@ -9,23 +9,30 @@ class Apontamento extends Model
 {
     use HasFactory;
 
-    protected $table = 'apontamentos'; // nome da tabela no banco
-    protected $primaryKey = 'id_apontamento'; // PK diferente de "id"
-    public $timestamps = false; // sua tabela já tem data_criacao, então não precisa de created_at/updated_at
+    protected $table = 'apontamentos';
+    protected $primaryKey = 'id_apontamento';
+    public $timestamps = false;
 
     protected $fillable = [
       'categoria',
-      'id_aluno',
+      'id_usuario',
       'data_apontamento',
       'horas_trabalhadas',
       'midia',
       'id_subprojeto',
       'descricao',
-      'data_criacao'
+      'data_criacao',
+      'tarefa',
+      'atividade',
     ];
 
     public function aluno()
     {
-        return $this->belongsTo(Aluno::class, 'id_aluno');
+        return $this->belongsTo(User::class, 'id_usuario', 'id_usuario');
+    }
+
+    public function subproject()
+    {
+        return $this->belongsTo(Subproject::class, 'id_subprojeto', 'id_subproject');
     }
 }

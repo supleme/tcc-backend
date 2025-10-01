@@ -6,6 +6,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubprojectController;
 use App\Models\Aluno;
 use App\Models\Apontamento;
+use App\Models\Subproject;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
@@ -44,7 +45,15 @@ Route::get('/apontamentos/aluno/{id_aluno}', [ApontamentoController::class, 'get
 
 Route::post('/apontamentos', [ApontamentoController::class, 'registerApontamento']);
 
+Route::get('/subprojects', function () {
+    return Subproject::all();
+});
+
 Route::post('/subprojects', [SubprojectController::class, 'registerSubproject']);
+
+Route::post('/subprojects/{id}/users/{userId}', [SubprojectController::class, 'assignUser']);
+
+Route::get('/subprojects/users/{userId}', [SubprojectController::class, 'listSubprojectsByUser']);
 
 Route::get('/alunos/report/{category}/{students}', [ApontamentoController::class, 'listNote']);
 

@@ -20,4 +20,9 @@ class Subproject extends Model
         'status',
         'link_ref',
     ];
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'responsible_subproject', 'subproject_id', 'user_id');
+    }
 }

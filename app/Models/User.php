@@ -36,8 +36,14 @@ class User extends Authenticatable implements JWTSubject
         'CPF',
         'active',
         'position',
-        'admission_date'
+        'admission_date',
+        'hours_available',
     ];
+
+    public function subprojects()
+    {
+        return $this->belongsToMany(Subproject::class, 'responsible_subproject', 'user_id', 'subproject_id');
+    }
 
 
     /**
