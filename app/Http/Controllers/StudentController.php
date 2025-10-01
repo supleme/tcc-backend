@@ -24,6 +24,7 @@ class StudentController extends Controller
           'password' => 'required|string|min:6',
           'CPF' => 'nullable|string|max:14|unique:alunos,CPF',
           'active' => 'boolean',
+          'hours_available' => 'required|integer',
         ]);
 
         $validated['type'] = 'Student';

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Apontamento;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ApontamentoController extends Controller
 {
@@ -12,13 +13,15 @@ class ApontamentoController extends Controller
     {
       try {
         $validated = $request->validate([
+          'atividade' => 'nullable|string|max:255',
           'categoria' => 'required|string|in:Atividade,Subprojeto',
-          'id_aluno' => 'required|integer|integer',
           'data_apontamento' => 'required|date',
-          'horas_trabalhadas' => 'required|numeric|min:0',
-          'midia' => 'nullable|string|max:255',
-        //   'id_subprojeto' => 'required|integer',
           'descricao' => 'nullable|string',
+          'horas_trabalhadas' => 'required|numeric|min:0',
+          'id_subprojeto' => 'nullable|integer',
+          'id_usuario' => 'required|integer|integer',
+          'midia' => 'nullable|string|max:255',
+          'tarefa' => 'nullable|string|max:255'
         ]);
 
         $validated['data_criacao'] = Carbon::now();
@@ -40,12 +43,11 @@ class ApontamentoController extends Controller
     }
 
   public function listNote($category, $student){
-    //dd($category, $student);
     try {
       $query = Apontamento::query();
 
       $query->with(['aluno' => function($q) {
-        $q->select('id_aluno', 'nome');
+        $q->select('id_usuario', 'name');
       }]);
 
       if($category !== 'Todas'){
@@ -53,15 +55,14 @@ class ApontamentoController extends Controller
       }
 
       if($student !== 'Todos'){
-        $query->where('id_aluno', $student);
         $studentArray = explode(',', $student);
-        $query->whereIn('id_aluno', $studentArray);
+        $query->whereIn('id_usuario', $studentArray);
       }
       $apontamentos = $query->get();
 
       $apontamentos = $apontamentos->map(function ($apontamento) {
-        $apontamento->aluno_nome = $apontamento->aluno->nome;
-        unset($apontamento->aluno); // Remove a relação para simplificar o JSON
+        $apontamento->aluno_nome = $apontamento->aluno->name;
+        unset($apontamento->aluno);
         return $apontamento;
       });
 
@@ -80,19 +81,40 @@ class ApontamentoController extends Controller
   public function getByAluno($id_aluno)
   {
     try {
-      $apontamentos = Apontamento::where('id_aluno', $id_aluno)->get();
+        DB::statement("SET lc_time_names = 'PT_BR'");
 
-      if ($apontamentos->isEmpty()) {
-        return response()->json(['message' => 'Nenhum apontamento encontrado para este aluno.'], 404);
-      }
-      return response()->json($apontamentos, 200);
+        $summaryMonthly = Apontamento::select(
+                DB::raw("DATE_FORMAT(data_apontamento, '%M/%Y') as mes"),
+                DB::raw('SUM(horas_trabalhadas) as horas_trabalhadas')
+            )
+            ->where('id_usuario', $id_aluno)
+            ->groupBy(DB::raw("DATE_FORMAT(data_apontamento, '%M/%Y')"))
+            ->orderBy('mes', 'desc')
+            ->get();
 
-    }
-    catch (\Exception $e) {
-      return response()->json([
-        'message' => 'Erro ao buscar apontamentos.',
-        'error' => $e->getMessage()
-      ], 500);
+        $summaryMonthly->transform(function ($item) {
+             $dateParts = explode('/', $item->mes);
+             $item->mes = ucfirst($dateParts[0]) . '/' . $dateParts[1];
+             return $item;
+        });
+
+        $apontamentos = Apontamento::with('subproject')
+            ->where('id_usuario', $id_aluno)
+            ->get();
+
+        if ($summaryMonthly->isEmpty() && $apontamentos->isEmpty()) {
+            return response()->json(['message' => 'Nenhum apontamento encontrado para este aluno.'], 404);
+        }
+
+        return response()->json([
+            'summaryMonthly' => $summaryMonthly, // Para o resumo de horas
+            'apontamentos' => $apontamentos, // Para a lista detalhada
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Erro ao buscar apontamentos.',
+            'error' => $e->getMessage()
+        ], 500);
     }
   }
 }
