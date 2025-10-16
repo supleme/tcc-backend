@@ -11,35 +11,45 @@ class ApontamentoController extends Controller
 {
     public function registerApontamento(Request $request)
     {
-      try {
-        $validated = $request->validate([
-          'atividade' => 'nullable|string|max:255',
-          'categoria' => 'required|string|in:Atividade,Subprojeto',
-          'data_apontamento' => 'required|date',
-          'descricao' => 'nullable|string',
-          'horas_trabalhadas' => 'required|numeric|min:0',
-          'id_subprojeto' => 'nullable|integer',
-          'id_usuario' => 'required|integer|integer',
-          'midia' => 'nullable|string|max:255',
-          'tarefa' => 'nullable|string|max:255'
-        ]);
+        DB::beginTransaction();
+        try {
+            $validated = $request->validate([
+            'atividade' => 'nullable|string|max:255',
+            'categoria' => 'required|string|in:Atividade,Subprojeto',
+            'data_apontamento' => 'required|date',
+            'descricao' => 'nullable|string',
+            'horas_trabalhadas' => 'required|numeric|min:0',
+            'id_subprojeto' => 'nullable|integer',
+            'id_usuario' => 'required|integer|integer',
+            'midia' => 'nullable|file|max:10240',
+            'tarefa' => 'nullable|string|max:255'
+            ]);
 
-        $validated['data_criacao'] = Carbon::now();
-        $validated['categoria'] = ucfirst(strtolower($validated['categoria']));
+            $caminho_midia = null;
+            if ($request->hasFile('midia')) {
+                $file = $request->file('midia');
+                $caminho_midia = $file->store('apontamentos', 'public');
+            }
 
-        $apontamento = Apontamento::create($validated);
+            $validated['midia'] = $caminho_midia;
+            $validated['data_criacao'] = Carbon::now();
+            $validated['categoria'] = ucfirst(strtolower($validated['categoria']));
 
-        return response()->json([
-          'message' => 'Apontamento criado com sucesso!',
-          'apontamento' => $apontamento
-        ], 201);
+            $apontamento = Apontamento::create($validated);
 
-      } catch (\Exception $e) {
-          return response()->json([
-            'message' => 'Erro ao criar apontamento.',
-            'error' => $e->getMessage()
-          ], 500);
-      }
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Apontamento criado com sucesso!',
+                'apontamento' => $apontamento
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro ao criar apontamento.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
   public function listNote($category, $student){
