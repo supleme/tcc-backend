@@ -52,7 +52,7 @@ class ApontamentoController extends Controller
         }
     }
 
-  public function listNote($category, $student){
+  public function listNote($category, $student, $month, $year) {
     try {
       $query = Apontamento::query();
 
@@ -68,6 +68,15 @@ class ApontamentoController extends Controller
         $studentArray = explode(',', $student);
         $query->whereIn('id_usuario', $studentArray);
       }
+    //   $year = now()->year;
+
+      if($month !== 'Todos'){
+          $query->whereYear('data_apontamento', $year)
+                ->whereMonth('data_apontamento', $month);
+      } else {
+          $query->whereYear('data_apontamento', $year);
+      }
+
       $apontamentos = $query->get();
 
       $apontamentos = $apontamentos->map(function ($apontamento) {
@@ -77,7 +86,7 @@ class ApontamentoController extends Controller
       });
 
       if ($apontamentos->isEmpty()) {
-        return response()->json(['message' => 'Nenhum apontamento encontrado para este aluno.'], 404);
+        return response()->json(['message' => 'Nenhum apontamento encontrado para este aluno.'], 204);
       }
       return response()->json($apontamentos, 200);
     } catch (\Exception $e) {

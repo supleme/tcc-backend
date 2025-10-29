@@ -55,7 +55,7 @@ Route::post('/subprojects/{id}/users/{userId}', [SubprojectController::class, 'a
 
 Route::get('/subprojects/users/{userId}', [SubprojectController::class, 'listSubprojectsByUser']);
 
-Route::get('/alunos/report/{category}/{students}', [ApontamentoController::class, 'listNote']);
+Route::get('/alunos/report/{category}/{students}/{month}/{year}', [ApontamentoController::class, 'listNote']);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/refresh', [AuthController::class, 'refresh']);
