@@ -23,43 +23,57 @@ Route::get('/test-db', function () {
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/refresh', [AuthController::class, 'refresh']);
 
-Route::get('/users', function (){
-    return User::all();
+
+
+Route::middleware('auth:api')->group(function () {
+    Route::post('/refresh', [AuthController::class, 'refresh']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', [AuthController::class, 'me']);
+
+    Route::get('/users', function (){
+        return User::all();
+    });
+
+    Route::get('/apontamentos/aluno/{id_aluno}', [ApontamentoController::class, 'getByAluno']);
+
+
+    Route::post('/apontamentos', [ApontamentoController::class, 'registerApontamento']);
+
+    Route::get('/subprojects', function () {
+        return Subproject::all();
+    });
+
+    Route::post('/subprojects', [SubprojectController::class, 'registerSubproject']);
+
+    Route::post('/subprojects/{id}/users/{userId}', [SubprojectController::class, 'assignUser']);
+
+    Route::get('/subprojects/users/{userId}', [SubprojectController::class, 'listSubprojectsByUser']);
+
+    Route::get('/alunos/report/{category}/{students}/{month}/{year}', [ApontamentoController::class, 'listNote']);
+
+
+    Route::post('/alunos', [StudentController::class, 'registerStudent']);
+
+    Route::get('/alunos', [StudentController::class, 'getStudents']);
+
+    Route::get('/alunos/{id}', function ($id){
+        return Aluno::find($id);
+    });
+
+    Route::get('/apontamentos', function () {
+        return Apontamento::all();
+    });
 });
-
-
-Route::post('/alunos', [StudentController::class, 'registerStudent']);
-
-Route::get('/alunos', [StudentController::class, 'getStudents']);
-
-Route::get('/alunos/{id}', function ($id){
-    return Aluno::find($id);
-});
-
-Route::get('/apontamentos', function () {
-    return Apontamento::all();
-});
-
-Route::get('/apontamentos/aluno/{id_aluno}', [ApontamentoController::class, 'getByAluno']);
-
-
-Route::post('/apontamentos', [ApontamentoController::class, 'registerApontamento']);
-
-Route::get('/subprojects', function () {
-    return Subproject::all();
-});
-
-Route::post('/subprojects', [SubprojectController::class, 'registerSubproject']);
-
-Route::post('/subprojects/{id}/users/{userId}', [SubprojectController::class, 'assignUser']);
-
-Route::get('/subprojects/users/{userId}', [SubprojectController::class, 'listSubprojectsByUser']);
-
-Route::get('/alunos/report/{category}/{students}/{month}/{year}', [ApontamentoController::class, 'listNote']);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 });
+
+// Route::middleware('auth:api')->group(function () {
+//     Route::post('/refresh', [AuthController::class, 'refresh']);
+//     Route::post('/logout', [AuthController::class, 'logout']);
+//     Route::get('/me', [AuthController::class, 'me']);
+// });
 ?>
