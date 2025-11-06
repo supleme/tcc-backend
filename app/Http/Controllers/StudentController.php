@@ -63,4 +63,56 @@ class StudentController extends Controller
         ], 500);
         }
     }
+
+    public function disableStudent($id){
+        try {
+            $student = User::where('id_usuario', $id)->first();
+
+            if (!$student) {
+                return response()->json(['message' => 'Aluno não encontrado.'], 404);
+            }
+
+            if ($student->active == false) {
+                return response()->json(['message' => 'Aluno já desativado.'], 400);
+            }
+
+            $student->active = false;
+            $student->save();
+
+            return response()->json(['message' => 'Aluno desativado com sucesso.'], 200);
+
+        }
+        catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro ao desativar aluno.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function enableStudent($id) {
+        try {
+            $student = User::where('id_usuario', $id)->first();
+
+            if (!$student) {
+                return response()->json(['message' => 'Aluno não encontrado.'], 404);
+            }
+
+            if ($student->active == true) {
+                return response()->json(['message' => 'Aluno já ativo.'], 400);
+            }
+
+            $student->active = true;
+            $student->save();
+
+            return response()->json(['message' => 'Aluno ativado com sucesso.'], 200);
+
+        }
+        catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro ao ativar aluno.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

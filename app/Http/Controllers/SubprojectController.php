@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Apontamento;
 use App\Models\Subproject;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -35,6 +36,39 @@ class SubprojectController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function deleteSubproject($id) {
+        try {
+            $subproject = Subproject::findOrFail($id);
+
+            if (!$subproject) {
+                return response()->json([
+                    'message' => 'Subprojeto nao encontrado.',
+                ], 404);
+            }
+
+            $hasAppointments = Apontamento::where('id_subprojeto', $subproject->id_subproject)->exists();
+
+            if ($hasAppointments) {
+                return response()->json([
+                    'message' => 'Não é possível deletar o subprojeto, existem apontamentos associados a ele.',
+                ], 409);
+            }
+
+            $subproject->delete();
+
+            return response()->json([
+                'message' => 'Subprojeto deletado com sucesso.',
+                'subproject' => $subproject
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro ao deletar subprojeto.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
     }
 
     public function assignUser($id, $userId)

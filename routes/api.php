@@ -39,11 +39,17 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/apontamentos', [ApontamentoController::class, 'registerApontamento']);
 
+    Route::post('/apontamentos/delete/{id}', [ApontamentoController::class, 'deleteApontamento']);
+
+    Route::post('/apontamentos/update', [ApontamentoController::class, 'updateApontamento']);
+
     Route::get('/subprojects', function () {
         return Subproject::all();
     });
 
     Route::post('/subprojects', [SubprojectController::class, 'registerSubproject']);
+
+    Route::post('/subprojects/delete/{id}', [SubprojectController::class, 'deleteSubproject']);
 
     Route::post('/subprojects/{id}/users/{userId}', [SubprojectController::class, 'assignUser']);
 
@@ -53,6 +59,10 @@ Route::middleware('auth:api')->group(function () {
 
 
     Route::post('/alunos', [StudentController::class, 'registerStudent']);
+
+    Route::post('/alunos/{id}/disable', [StudentController::class, 'disableStudent']);
+
+    Route::post('/alunos/{id}/active', [StudentController::class, 'enableStudent']);
 
     Route::get('/alunos', [StudentController::class, 'getStudents']);
 

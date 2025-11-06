@@ -136,4 +136,46 @@ class ApontamentoController extends Controller
         ], 500);
     }
   }
+
+  public function deleteApontamento($id) {
+    $apontamento = Apontamento::find($id);
+
+    if (!$apontamento) {
+        return response()->json([
+            'message' => 'Apontamento nao encontrado.',
+        ], 404);
+    }
+
+    $apontamento->delete();
+
+    return response()->json([
+        'message' => 'Apontamento deletado com sucesso.',
+        'apontamento' => $apontamento
+    ], 200);
+  }
+
+  public function updateApontamento(Request $request) {
+    $validated = $request->validate([
+        'id_apontamento' => 'required|integer',
+        'horas_trabalhadas' => 'required|integer',
+        'data_apontamento' => 'required|date',
+    ]);
+
+    $apontamento = Apontamento::find($validated['id_apontamento']);
+
+    if (!$apontamento) {
+        return response()->json([
+            'message' => 'Apontamento não encontrado.'
+        ], 404);
+    }
+
+    $apontamento->horas_trabalhadas = $validated['horas_trabalhadas'];
+    $apontamento->data_apontamento = $validated['data_apontamento'];
+    $apontamento->save();
+
+    return response()->json([
+        'message' => 'Horas atualizadas com sucesso!',
+        'apontamento' => $apontamento
+    ], 200);
+  }
 }
